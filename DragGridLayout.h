@@ -50,6 +50,9 @@ public:
     QWidget *ignoredWidget() const;
     void setIgnoredWidget(QWidget *widget);
 
+    int animationDuration() const;
+    void setAnimationDuration(int ms);
+
     int placeholderIndex() const;
     void setPlaceholderIndex(int index);
 
@@ -81,6 +84,9 @@ private:
 
     QRect cellRect(int index, const QRect &contentRect, int columns, const QSize &cellSize) const;
 
+    static int computeTargetIndex(const QPoint &localPos, int columns,
+                                  const QSize &cellSize, int layoutSpacing, int itemCount);
+
     void setWidgetGeometryAnimated(QWidget *widget, const QRect &target);
     void stopAnimationForWidget(QWidget *widget);
 
@@ -92,6 +98,7 @@ private:
     bool m_compactWhenSparseEnabled = false;
     QWidget *m_ignoredWidget = nullptr;
     int m_placeholderIndex = -1;
+    int m_animationDuration = 200;
 
     // 缓存：invalidate 时失效，惰性计算
     mutable QSize m_cachedMinCellSize;

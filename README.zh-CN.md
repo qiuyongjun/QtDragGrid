@@ -76,6 +76,10 @@ grid->addWidget(new MyCardWidget());
 - `void clear()` — 清空并销毁所有子控件。
 - `int count() const` / `QList<QWidget *> widgets() const` — 查询当前子控件。
 - `void orderChanged()` — 用户通过拖拽改变顺序时发出的信号。
+- `int dragThreshold() / void setDragThreshold(int)` — 触发拖拽的按压移动阈值（像素，默认 6）。
+- `qreal ghostScale() / void setGhostScale(qreal)` — 拖拽镜像缩放比例（默认 1.05）。
+- `int animationDuration() / void setAnimationDuration(int)` — 布局过渡动画时长，单位毫秒（默认 200）。
+- `int scrollTimerInterval() / void setScrollTimerInterval(int)` — 自动滚动定时器间隔，单位毫秒（默认 16）。
 
 ## 项目结构
 

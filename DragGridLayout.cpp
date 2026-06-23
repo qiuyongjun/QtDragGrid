@@ -333,6 +333,16 @@ void DragGridLayout::setIgnoredWidget(QWidget *widget)
     invalidate();
 }
 
+int DragGridLayout::animationDuration() const
+{
+    return m_animationDuration;
+}
+
+void DragGridLayout::setAnimationDuration(int ms)
+{
+    m_animationDuration = qMax(0, ms);
+}
+
 int DragGridLayout::placeholderIndex() const
 {
     return m_placeholderIndex;
@@ -450,10 +460,10 @@ void DragGridLayout::setWidgetGeometryAnimated(QWidget *widget, const QRect &tar
     QPropertyAnimation *animation = m_geometryAnimations.value(widget).data();
     if (!animation) {
         animation = new QPropertyAnimation(widget, "geometry", widget);
-        animation->setDuration(200);
         animation->setEasingCurve(QEasingCurve::OutCubic);
         m_geometryAnimations[widget] = animation;
     }
+    animation->setDuration(m_animationDuration);
 
     animation->stop();
     animation->setStartValue(widget->geometry());
@@ -497,16 +507,28 @@ int DragGridLayout::targetIndexAt(const QPoint &pos) const
         return -1;
     }
 
-    const int layoutSpacing = qMax(0, spacing());
-    const int stepWidth = qMax(1, cellSize.width() + layoutSpacing);
-    const int stepHeight = qMax(1, cellSize.height() + layoutSpacing);
+    return computeTargetIndex(pos - contentRect.topLeft(), columns,
+                              cellSize, spacing(), m_items.size());
+}
 
-    const QPoint localPos = pos - contentRect.topLeft();
-    const int row = qMax(0, localPos.y() / stepHeight);
-    int col = localPos.x() / stepWidth;
+int DragGridLayout::computeTargetIndex(const QPoint &localPos, int columns,
+                                       const QSize &cellSize, int layoutSpacing, int itemCount)
+{
+    Q_ASSERT(columns > 0);
+    Q_ASSERT(!cellSize.isEmpty());
+    Q_ASSERT(itemCount > 0);
+
+    const int safeSpacing = qMax(0, layoutSpacing);
+    const int stepWidth = qMax(1, cellSize.width() + safeSpacing);
+    const int stepHeight = qMax(1, cellSize.height() + safeSpacing);
+
+    // 左侧空白统一映射到首个位置，避免虚拟半区带来的不可预测行为。
     if (localPos.x() < 0) {
-        col = -1;
+        return 0;
     }
+
+    const int row = qMax(0, localPos.y() / stepHeight);
+    const int col = localPos.x() / stepWidth;
 
     int rawIndex = row * columns + col;
 
@@ -524,12 +546,7 @@ int DragGridLayout::targetIndexAt(const QPoint &pos) const
     }
 
     // 占位槽数量与当前总项数相同（被忽略的项由占位符填补）。
-    const int maxIndex = m_items.size() - 1;
-    if (maxIndex < 0) {
-        return -1;
-    }
-
-    return qBound(0, rawIndex, maxIndex);
+    return qBound(0, rawIndex, itemCount - 1);
 }
 
 QRect DragGridLayout::placeholderRectAt(int placeholderIndex) const

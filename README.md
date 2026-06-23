@@ -76,6 +76,10 @@ grid->addWidget(new MyCardWidget());
 - `void clear()` — Remove and destroy all items.
 - `int count() const` / `QList<QWidget *> widgets() const` — Query current items.
 - `void orderChanged()` — Signal emitted when the user reorders items by dragging.
+- `int dragThreshold() / void setDragThreshold(int)` — Pixel distance before a press becomes a drag.
+- `qreal ghostScale() / void setGhostScale(qreal)` — Scale factor of the drag ghost (default 1.05).
+- `int animationDuration() / void setAnimationDuration(int)` — Layout transition duration in milliseconds (default 200).
+- `int scrollTimerInterval() / void setScrollTimerInterval(int)` — Auto-scroll timer interval in milliseconds (default 16).
 
 ## Project Layout
 

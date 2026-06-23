@@ -47,6 +47,18 @@ public:
     void setDragEnabled(bool enable);
     bool dragEnabled() const;
 
+    int dragThreshold() const;
+    void setDragThreshold(int threshold);
+
+    qreal ghostScale() const;
+    void setGhostScale(qreal scale);
+
+    int scrollTimerInterval() const;
+    void setScrollTimerInterval(int ms);
+
+    int animationDuration() const;
+    void setAnimationDuration(int ms);
+
     void setEqualCellSizeEnabled(bool enable);
     bool equalCellSizeEnabled() const;
     void setCompactWhenSparseEnabled(bool enable);
@@ -91,14 +103,17 @@ private:
     QWidget *m_pressWidget = nullptr;
     QPoint m_pressPos;
     QPoint m_pressOffset;
+    QPoint m_lastMousePos;
 
     QWidget *m_dragGhostWidget = nullptr;
     QLabel  *m_emptyStateLabel = nullptr;
     QPropertyAnimation *m_placeholderPulseAnimation = nullptr;
 
     bool m_dragEnable = false;
-    static constexpr int kDragThreshold = 6;
-    static constexpr qreal kGhostScale = 1.05;
+    int m_dragThreshold = 6;
+    qreal m_ghostScale = 1.05;
+    int m_scrollTimerInterval = 16;
+    int m_animationDuration = 200;
 };
 
 #endif // DRAGGRIDWIDGET_H
