@@ -72,7 +72,7 @@ if(GRIDLAYOUT_BUILD_DEMO)
         endif()
     endif()
 
-    target_link_libraries(GridLayoutDemo PRIVATE DragGrid)
+    target_link_libraries(GridLayoutDemo PRIVATE DragGrid Qt${QT_VERSION_MAJOR}::Widgets)
 
     # Copy the stylesheet next to the executable so the demo can load it at runtime.
     set(QSS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/style.qss")
