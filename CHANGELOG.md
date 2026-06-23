@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-23
+
 ### Added
 
 - Keyboard drag-and-drop support (Space to pick, arrows to move, Enter to drop, Escape to cancel).
