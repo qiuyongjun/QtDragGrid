@@ -16,7 +16,7 @@ When reporting a bug, include:
 
 ## Submitting Pull Requests
 
-1. Fork the repository and create a feature branch from `main`.
+1. Fork the repository and create a feature branch from `master`.
 2. Make your changes, keeping the existing code style.
 3. Add or update tests and documentation if applicable.
 4. Ensure the project still builds on your local machine.

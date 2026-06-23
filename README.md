@@ -21,8 +21,7 @@ QtDragGrid provides a custom grid layout and a container widget that supports dr
 
 ## Preview
 
-<!-- TODO: Replace with a GIF or screenshot that demonstrates drag-and-drop reordering -->
-![Preview](docs/preview.png)
+A preview GIF or screenshot will be added before the official release.
 
 ## Requirements
 
@@ -64,6 +63,19 @@ grid->setDragEnabled(true);
 grid->setColumnCount(4);
 grid->addWidget(new MyCardWidget());
 ```
+
+### API Overview
+
+- `void setDragEnabled(bool enable)` — Enable or disable drag-and-drop reordering.
+- `void setColumnCount(int count)` — Set the number of columns.
+- `void setMinimumCellSize(const QSize &size)` — Set the minimum cell size.
+- `void setEqualCellSizeEnabled(bool enable)` — Make all cells the same width.
+- `void setCompactWhenSparseEnabled(bool enable)` — Compact columns when there are few items.
+- `void addWidget(QWidget *widget)` / `void insertWidget(int index, QWidget *widget)` — Add items.
+- `void removeWidget(QWidget *widget)` / `void deleteWidget(QWidget *widget)` / `QWidget *takeWidget(int index)` — Remove items.
+- `void clear()` — Remove and destroy all items.
+- `int count() const` / `QList<QWidget *> widgets() const` — Query current items.
+- `void orderChanged()` — Signal emitted when the user reorders items by dragging.
 
 ## Project Layout
 

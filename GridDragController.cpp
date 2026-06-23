@@ -8,9 +8,7 @@ GridDragController::GridDragController(QObject *parent)
 {
 }
 
-void GridDragController::beginDrag(QWidget *widget,
-                                   const QPoint &pointOffset,
-                                   const DragVisualState &visualState)
+void GridDragController::beginDrag(QWidget *widget, const QPoint &pointOffset)
 {
     if (!widget) {
         return;
@@ -18,7 +16,6 @@ void GridDragController::beginDrag(QWidget *widget,
 
     m_draggedWidget = widget;
     m_dragPointOffset = pointOffset;
-    m_visualState = visualState;
 }
 
 void GridDragController::updateDragPosition(const QPoint &widgetPos)
@@ -34,7 +31,6 @@ void GridDragController::endDrag()
 {
     m_draggedWidget = nullptr;
     m_dragPointOffset = QPoint();
-    m_visualState = DragVisualState();
 }
 
 bool GridDragController::isDragging() const
@@ -50,9 +46,4 @@ QWidget *GridDragController::draggedWidget() const
 QPoint GridDragController::dragPointOffset() const
 {
     return m_dragPointOffset;
-}
-
-GridDragController::DragVisualState GridDragController::visualState() const
-{
-    return m_visualState;
 }

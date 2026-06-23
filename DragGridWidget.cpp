@@ -295,12 +295,8 @@ void DragGridWidget::startDragOperation(QWidget *widget, const QPoint &offset)
     }
 
     const int originalIndex = indexOfWidget(widget);
-    const QSize normalSize = widget->size();
-    const QSize draggedSize(qMax(1, static_cast<int>(widget->width() * kGhostScale)),
-                            qMax(1, static_cast<int>(widget->height() * kGhostScale)));
 
-    m_dragController->beginDrag(widget, offset,
-                                GridDragController::DragVisualState{normalSize, draggedSize});
+    m_dragController->beginDrag(widget, offset);
 
     createDragGhost(widget);
     widget->hide();
