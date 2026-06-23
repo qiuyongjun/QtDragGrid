@@ -79,6 +79,12 @@ public:
     void setCompactWhenSparseEnabled(bool enable);
     bool compactWhenSparseEnabled() const;
 
+    QString emptyText() const;
+    void setEmptyText(const QString &text);
+
+    bool emptyStateVisible() const;
+    void setEmptyStateVisible(bool visible);
+
 signals:
     void orderChanged();
 
@@ -120,7 +126,7 @@ private:
     DragGridLayout *m_gridLayout = nullptr;
     QWidget *m_placeholderWidget = nullptr;
     QTimer *m_scrollTimer = nullptr;
-    QScrollArea *m_scrollArea = nullptr;
+    QPointer<QScrollArea> m_scrollArea;
 
     DragState m_dragState = DragState::Idle;
     QWidget *m_pressWidget = nullptr;
@@ -146,6 +152,9 @@ private:
     int m_autoScrollMaxSpeed = 16;
     qreal m_placeholderOpacity = 0.5;
     int m_placeholderPulseDuration = 800;
+
+    QString m_emptyText = QStringLiteral("No items.");
+    bool m_emptyStateVisible = true;
 };
 
 #endif // DRAGGRIDWIDGET_H

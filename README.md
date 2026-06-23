@@ -1,8 +1,8 @@
 # QtDragGrid
 
-[![CI](https://github.com/<your-github-username>/GridLayout/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-github-username>/GridLayout/actions/workflows/ci.yml)
+[![CI](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml/badge.svg)](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/<your-github-username>/GridLayout)](https://github.com/<your-github-username>/GridLayout/releases)
+[![Release](https://img.shields.io/github/v/release/qiuyongjun/GridLayout)](https://github.com/qiuyongjun/GridLayout/releases)
 
 A reusable Qt Widgets component for draggable grid layouts.
 
@@ -21,7 +21,7 @@ QtDragGrid provides a custom grid layout and a container widget that supports dr
 
 ## Preview
 
-A preview GIF or screenshot will be added before the official release.
+![Drag and drop reordering preview](docs/preview.gif)
 
 ## Requirements
 
@@ -135,4 +135,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Author
 
-- GitHub: [@<your-github-username>](https://github.com/<your-github-username>)
+- GitHub: [@qiuyongjun](https://github.com/qiuyongjun)

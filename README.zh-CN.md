@@ -1,8 +1,8 @@
 # QtDragGrid
 
-[![CI](https://github.com/<your-github-username>/GridLayout/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-github-username>/GridLayout/actions/workflows/ci.yml)
+[![CI](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml/badge.svg)](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/<your-github-username>/GridLayout)](https://github.com/<your-github-username>/GridLayout/releases)
+[![Release](https://img.shields.io/github/v/release/qiuyongjun/GridLayout)](https://github.com/qiuyongjun/GridLayout/releases)
 
 一个可复用的 Qt Widgets 拖拽网格布局组件。
 
@@ -21,7 +21,7 @@ QtDragGrid 基于 `QLayout` 实现了一套自定义网格布局，并提供了�
 
 ## 效果预览
 
-正式 release 前将补充演示 GIF 或截图。
+![拖拽重排效果预览](docs/preview.gif)
 
 ## 环境要求
 
@@ -135,4 +135,4 @@ grid->addWidget(new MyCardWidget());
 
 ## 作者
 
-- GitHub: [@<your-github-username>](https://github.com/<your-github-username>)
+- GitHub: [@qiuyongjun](https://github.com/qiuyongjun)

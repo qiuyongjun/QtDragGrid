@@ -41,7 +41,7 @@ DragGridWidget::DragGridWidget(QScrollArea *scrollArea, QWidget *parent)
     m_placeholderPulseAnimation->setEndValue(qMax(0.0, m_placeholderOpacity * 0.6));
     m_placeholderPulseAnimation->setLoopCount(-1);
 
-    m_emptyStateLabel = new QLabel(tr("暂无卡片，点击上方按钮添加"), this);
+    m_emptyStateLabel = new QLabel(m_emptyText, this);
     m_emptyStateLabel->setObjectName("GridEmptyState");
     m_emptyStateLabel->setAlignment(Qt::AlignCenter);
     m_emptyStateLabel->hide();
@@ -305,6 +305,35 @@ void DragGridWidget::setCompactWhenSparseEnabled(bool enable)
 bool DragGridWidget::compactWhenSparseEnabled() const
 {
     return m_gridLayout->compactWhenSparseEnabled();
+}
+
+QString DragGridWidget::emptyText() const
+{
+    return m_emptyText;
+}
+
+void DragGridWidget::setEmptyText(const QString &text)
+{
+    if (m_emptyText == text) {
+        return;
+    }
+    m_emptyText = text;
+    m_emptyStateLabel->setText(m_emptyText);
+    updateEmptyState();
+}
+
+bool DragGridWidget::emptyStateVisible() const
+{
+    return m_emptyStateVisible;
+}
+
+void DragGridWidget::setEmptyStateVisible(bool visible)
+{
+    if (m_emptyStateVisible == visible) {
+        return;
+    }
+    m_emptyStateVisible = visible;
+    updateEmptyState();
 }
 
 void DragGridWidget::mousePressEvent(QMouseEvent *event)
@@ -789,9 +818,9 @@ void DragGridWidget::clearDragGhost()
 
 void DragGridWidget::updateEmptyState()
 {
-    const bool empty = (count() == 0);
-    m_emptyStateLabel->setVisible(empty);
-    if (empty) {
+    const bool show = (count() == 0) && m_emptyStateVisible;
+    m_emptyStateLabel->setVisible(show);
+    if (show) {
         m_emptyStateLabel->setGeometry(rect().adjusted(20, 20, -20, -20));
     }
 }
@@ -826,7 +855,7 @@ void DragGridWidget::autoScroll()
     const int maxSpeed = m_autoScrollMaxSpeed;
     const int marginSquared = qMax(1, margin * margin);
 
-    const QPoint mouseInViewport = m_scrollArea->viewport()->mapFrom(this, m_lastMousePos);
+    const QPoint mouseInViewport = m_scrollArea->viewport()->mapFromGlobal(mapToGlobal(m_lastMousePos));
 
     auto *vBar = m_scrollArea->verticalScrollBar();
     auto *hBar = m_scrollArea->horizontalScrollBar();

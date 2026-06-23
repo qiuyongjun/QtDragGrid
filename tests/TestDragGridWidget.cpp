@@ -1,4 +1,5 @@
 #include <QTest>
+#include <QLabel>
 #include <QScrollArea>
 #include <QWidget>
 
@@ -12,6 +13,8 @@ private slots:
     void dragEnabled_togglesState();
     void placeholderProperties_roundTrip();
     void dragHandle_canBeSet();
+    void emptyText_defaultAndCustom();
+    void emptyStateVisible_togglesVisibility();
     void setDragEnabled_falseDuringDrag_doesNotCrash();
 };
 
@@ -58,6 +61,40 @@ void TestDragGridWidget::dragHandle_canBeSet()
     QVERIFY(!grid.dragHandle());
     grid.setDragHandle(&handle);
     QCOMPARE(grid.dragHandle(), &handle);
+}
+
+void TestDragGridWidget::emptyText_defaultAndCustom()
+{
+    DragGridWidget grid;
+
+    QCOMPARE(grid.emptyText(), QStringLiteral("No items."));
+
+    auto *label = grid.findChild<QLabel *>(QStringLiteral("GridEmptyState"));
+    QVERIFY(label);
+    QCOMPARE(label->text(), QStringLiteral("No items."));
+
+    grid.setEmptyText(QStringLiteral("Custom empty text"));
+    QCOMPARE(grid.emptyText(), QStringLiteral("Custom empty text"));
+    QCOMPARE(label->text(), QStringLiteral("Custom empty text"));
+}
+
+void TestDragGridWidget::emptyStateVisible_togglesVisibility()
+{
+    DragGridWidget grid;
+
+    QVERIFY(grid.emptyStateVisible());
+
+    auto *label = grid.findChild<QLabel *>(QStringLiteral("GridEmptyState"));
+    QVERIFY(label);
+    QVERIFY(label->isVisible());
+
+    grid.setEmptyStateVisible(false);
+    QVERIFY(!grid.emptyStateVisible());
+    QVERIFY(!label->isVisible());
+
+    grid.setEmptyStateVisible(true);
+    QVERIFY(grid.emptyStateVisible());
+    QVERIFY(label->isVisible());
 }
 
 void TestDragGridWidget::setDragEnabled_falseDuringDrag_doesNotCrash()
