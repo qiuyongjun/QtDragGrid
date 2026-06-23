@@ -27,10 +27,15 @@ jobs:
 
       - name: Configure (Unix)
         if: runner.os != 'Windows'
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
         run: |
           CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release"
-          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.qt-version }}" = "5.15.2" ]; then
-            CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_OSX_ARCHITECTURES=x86_64"
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0"
+            if [ "${{ matrix.qt-version }}" = "5.15.2" ]; then
+              CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_OSX_ARCHITECTURES=x86_64"
+            fi
           fi
           cmake -S . -B build $CMAKE_ARGS
 
