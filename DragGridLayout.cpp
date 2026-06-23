@@ -290,7 +290,6 @@ QWidget *DragGridLayout::takeWidget(int index)
 
 bool DragGridLayout::moveItem(int from, int to)
 {
-    Q_ASSERT(from >= 0 && from < m_items.size());
     if (from < 0 || from >= m_items.size()) {
         return false;
     }

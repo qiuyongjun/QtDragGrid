@@ -43,6 +43,7 @@ CMakeLists.txt.user
 *.ipch
 *.qmake.stash
 compile_commands.json
+Testing/
 
 # OS files
 .DS_Store
