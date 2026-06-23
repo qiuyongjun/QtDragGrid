@@ -3,6 +3,6 @@
 include(CMakeFindDependencyMacro)
 find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Widgets)
 
-include("${CMAKE_CURRENT_LIST_DIR}/GridLayoutTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/QtDragGridTargets.cmake")
 
-check_required_components(GridLayout)
+check_required_components(QtDragGrid)

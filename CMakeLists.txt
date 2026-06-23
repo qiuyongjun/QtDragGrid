@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(GridLayout VERSION 0.1.0 LANGUAGES CXX)
+project(QtDragGrid VERSION 0.1.0 LANGUAGES CXX)
 
-set(GRIDLAYOUT_IS_TOP_LEVEL OFF)
+set(QTDRAGGRID_IS_TOP_LEVEL OFF)
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    set(GRIDLAYOUT_IS_TOP_LEVEL ON)
+    set(QTDRAGGRID_IS_TOP_LEVEL ON)
 endif()
 
-option(GRIDLAYOUT_BUILD_DEMO "Build the GridLayout demo application" ${GRIDLAYOUT_IS_TOP_LEVEL})
-option(GRIDLAYOUT_BUILD_TESTS "Build GridLayout tests" ${GRIDLAYOUT_IS_TOP_LEVEL})
+option(QTDRAGGRID_BUILD_DEMO "Build the GridLayout demo application" ${QTDRAGGRID_IS_TOP_LEVEL})
+option(QTDRAGGRID_BUILD_TESTS "Build GridLayout tests" ${QTDRAGGRID_IS_TOP_LEVEL})
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
-if(GRIDLAYOUT_BUILD_TESTS)
+if(QTDRAGGRID_BUILD_TESTS)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 endif()
 
@@ -48,7 +48,7 @@ target_link_libraries(DragGrid PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
 # ---------------------------------------------------------------------------
 # Demo application
 # ---------------------------------------------------------------------------
-if(GRIDLAYOUT_BUILD_DEMO)
+if(QTDRAGGRID_BUILD_DEMO)
     set(DEMO_SOURCES
         main.cpp
         MainWindow.cpp
@@ -60,31 +60,31 @@ if(GRIDLAYOUT_BUILD_DEMO)
     )
 
     if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-        qt_add_executable(GridLayoutDemo
+        qt_add_executable(QtDragGridDemo
             MANUAL_FINALIZATION
             ${DEMO_SOURCES}
         )
     else()
         if(ANDROID)
-            add_library(GridLayoutDemo SHARED ${DEMO_SOURCES})
+            add_library(QtDragGridDemo SHARED ${DEMO_SOURCES})
         else()
-            add_executable(GridLayoutDemo ${DEMO_SOURCES})
+            add_executable(QtDragGridDemo ${DEMO_SOURCES})
         endif()
     endif()
 
-    target_link_libraries(GridLayoutDemo PRIVATE DragGrid Qt${QT_VERSION_MAJOR}::Widgets)
+    target_link_libraries(QtDragGridDemo PRIVATE DragGrid Qt${QT_VERSION_MAJOR}::Widgets)
 
     # Copy the stylesheet next to the executable so the demo can load it at runtime.
     set(QSS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/style.qss")
-    add_custom_command(TARGET GridLayoutDemo POST_BUILD
+    add_custom_command(TARGET QtDragGridDemo POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${QSS_FILE}" "$<TARGET_FILE_DIR:GridLayoutDemo>/style.qss"
+        "${QSS_FILE}" "$<TARGET_FILE_DIR:QtDragGridDemo>/style.qss"
     )
 
     if(${QT_VERSION} VERSION_LESS 6.1.0)
-        set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.GridLayoutDemo)
+        set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.QtDragGridDemo)
     endif()
-    set_target_properties(GridLayoutDemo PROPERTIES
+    set_target_properties(QtDragGridDemo PROPERTIES
         ${BUNDLE_ID_OPTION}
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -93,14 +93,14 @@ if(GRIDLAYOUT_BUILD_DEMO)
     )
 
     if(QT_VERSION_MAJOR EQUAL 6)
-        qt_finalize_executable(GridLayoutDemo)
+        qt_finalize_executable(QtDragGridDemo)
     endif()
 endif()
 
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
-if(GRIDLAYOUT_BUILD_TESTS)
+if(QTDRAGGRID_BUILD_TESTS)
     enable_testing()
 
     set(TEST_FILES
@@ -122,15 +122,15 @@ endif()
 include(GNUInstallDirs)
 
 install(TARGETS DragGrid
-    EXPORT GridLayoutTargets
+    EXPORT QtDragGridTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE DESTINATION .
 )
 
-if(GRIDLAYOUT_BUILD_DEMO)
-    install(TARGETS GridLayoutDemo
+if(QTDRAGGRID_BUILD_DEMO)
+    install(TARGETS QtDragGridDemo
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         BUNDLE DESTINATION .
     )
@@ -142,27 +142,27 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(EXPORT GridLayoutTargets
-    FILE GridLayoutTargets.cmake
-    NAMESPACE GridLayout::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GridLayout
+install(EXPORT QtDragGridTargets
+    FILE QtDragGridTargets.cmake
+    NAMESPACE QtDragGrid::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtDragGrid
 )
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GridLayoutConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/GridLayoutConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GridLayout
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/QtDragGridConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/QtDragGridConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtDragGrid
 )
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/GridLayoutConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/QtDragGridConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/GridLayoutConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/GridLayoutConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GridLayout
+    "${CMAKE_CURRENT_BINARY_DIR}/QtDragGridConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/QtDragGridConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QtDragGrid
 )

@@ -27,7 +27,12 @@ jobs:
 
       - name: Configure (Unix)
         if: runner.os != 'Windows'
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: |
+          CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release"
+          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.qt-version }}" = "5.15.2" ]; then
+            CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_OSX_ARCHITECTURES=x86_64"
+          fi
+          cmake -S . -B build $CMAKE_ARGS
 
       - name: Build (Unix)
         if: runner.os != 'Windows'

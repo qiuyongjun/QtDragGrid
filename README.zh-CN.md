@@ -1,8 +1,8 @@
 # QtDragGrid
 
-[![CI](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml/badge.svg)](https://github.com/qiuyongjun/GridLayout/actions/workflows/ci.yml)
+[![CI](https://github.com/qiuyongjun/QtDragGrid/actions/workflows/ci.yml/badge.svg)](https://github.com/qiuyongjun/QtDragGrid/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/qiuyongjun/GridLayout)](https://github.com/qiuyongjun/GridLayout/releases)
+[![Release](https://img.shields.io/github/v/release/qiuyongjun/QtDragGrid)](https://github.com/qiuyongjun/QtDragGrid/releases)
 
 一个可复用的 Qt Widgets 拖拽网格布局组件。
 
@@ -41,7 +41,7 @@ cmake --build build --config Release
 运行演示程序：
 
 ```bash
-./build/GridLayoutDemo
+./build/QtDragGridDemo
 ```
 
 ### 运行测试
