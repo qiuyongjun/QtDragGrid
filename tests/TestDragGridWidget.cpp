@@ -204,7 +204,7 @@ void TestDragGridWidget::escapeDuringDrag_restoresOriginalOrder()
     QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
-    QTest::mouseMove(&grid, third->geometry().center() + QPoint(60, 0));
+    QTest::mouseMove(&grid, third->geometry().center());
     QTest::keyClick(&grid, Qt::Key_Escape);
     QCoreApplication::processEvents();
 
@@ -225,7 +225,7 @@ void TestDragGridWidget::deleteWidget_duringDrag_removesDraggedWidget()
     QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
-    QTest::mouseMove(&grid, second->geometry().center() + QPoint(60, 0));
+    QTest::mouseMove(&grid, second->geometry().center());
     grid.deleteWidget(first);
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
     QCoreApplication::processEvents();
@@ -246,7 +246,7 @@ void TestDragGridWidget::setDragEnabled_falseDuringDrag_cancelsDrag()
     QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
-    QTest::mouseMove(&grid, third->geometry().center() + QPoint(60, 0));
+    QTest::mouseMove(&grid, third->geometry().center());
     grid.setDragEnabled(false);
     QCoreApplication::processEvents();
 
@@ -267,7 +267,7 @@ void TestDragGridWidget::zeroAnimationDuration_reordersDirectly()
     grid.setDragEnabled(true);
     grid.setAnimationDuration(0);
 
-    dragFromTo(&grid, first->geometry().center(), second->geometry().center() + QPoint(60, 0));
+    dragFromTo(&grid, first->geometry().center(), second->geometry().center());
 
     QCOMPARE(objectNames(grid.widgets()), QStringList({QStringLiteral("second"),
                                                        QStringLiteral("first")}));
