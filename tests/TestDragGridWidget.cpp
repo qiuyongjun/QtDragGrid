@@ -33,6 +33,7 @@ QWidget *createItem(const QString &name)
     widget->setObjectName(name);
     widget->setMinimumSize(100, 100);
     widget->resize(100, 100);
+    widget->setFocusPolicy(Qt::StrongFocus);
     return widget;
 }
 
@@ -181,7 +182,9 @@ void TestDragGridWidget::keyboardDrag_reordersWidgets()
     auto *second = createItem(QStringLiteral("second"));
     prepareGrid(&grid, first, second);
     grid.setDragEnabled(true);
+    grid.activateWindow();
     first->setFocus();
+    QCoreApplication::processEvents();
     QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::keyClick(&grid, Qt::Key_Space);
@@ -273,7 +276,9 @@ void TestDragGridWidget::zeroAnimationDuration_reordersDirectly()
     prepareGrid(&grid, first, second);
     grid.setDragEnabled(true);
     grid.setAnimationDuration(0);
+    grid.activateWindow();
     first->setFocus();
+    QCoreApplication::processEvents();
 
     QTest::keyClick(&grid, Qt::Key_Space);
     QTest::keyClick(&grid, Qt::Key_Right);
