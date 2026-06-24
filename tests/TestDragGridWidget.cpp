@@ -67,7 +67,9 @@ void dragFromTo(DragGridWidget *grid, const QPoint &from, const QPoint &to)
 {
     QTest::mousePress(grid, Qt::LeftButton, Qt::NoModifier, from);
     QTest::mouseMove(grid, from + QPoint(30, 0));
+    QCoreApplication::processEvents();
     QTest::mouseMove(grid, to);
+    QCoreApplication::processEvents();
     QTest::mouseRelease(grid, Qt::LeftButton, Qt::NoModifier, to);
     QCoreApplication::processEvents();
 }
@@ -263,15 +265,20 @@ void TestDragGridWidget::setDragEnabled_falseDuringDrag_cancelsDrag()
 
 void TestDragGridWidget::zeroAnimationDuration_reordersDirectly()
 {
+    // 使用键盘拖拽验证 zero-animation 下的落位：鼠标拖拽在 Qt 5.15.2 offscreen
+    // 上坐标不稳定，键盘拖拽只依赖占位符逻辑，不受鼠标取整影响。
     DragGridWidget grid;
     auto *first = createItem(QStringLiteral("first"));
     auto *second = createItem(QStringLiteral("second"));
     prepareGrid(&grid, first, second);
     grid.setDragEnabled(true);
     grid.setAnimationDuration(0);
+    first->setFocus();
 
-    // 目标点需越过 cell 中心，避免 Qt 5.15.2 offscreen 取整导致占位符判断落在原 cell。
-    dragFromTo(&grid, first->geometry().center(), second->geometry().center() + QPoint(60, 0));
+    QTest::keyClick(&grid, Qt::Key_Space);
+    QTest::keyClick(&grid, Qt::Key_Right);
+    QTest::keyClick(&grid, Qt::Key_Return);
+    QCoreApplication::processEvents();
 
     QCOMPARE(objectNames(grid.widgets()), QStringList({QStringLiteral("second"),
                                                        QStringLiteral("first")}));
