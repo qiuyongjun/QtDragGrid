@@ -1,6 +1,7 @@
 #include <QTest>
 #include <QLabel>
 #include <QLayout>
+#include <QMouseEvent>
 #include <QSignalSpy>
 #include <QScrollArea>
 #include <QWidget>
@@ -66,12 +67,22 @@ QStringList objectNames(const QList<QWidget *> &widgets)
 
 void dragFromTo(DragGridWidget *grid, const QPoint &from, const QPoint &to)
 {
-    QTest::mousePress(grid, Qt::LeftButton, Qt::NoModifier, from);
-    QTest::mouseMove(grid, from + QPoint(30, 0));
+    // CI 的 offscreen 后端对 QTest::mouseMove 的按键状态处理不稳定，这里显式携带 LeftButton。
+    auto sendMouse = [grid](QEvent::Type type, const QPoint &pos,
+                            Qt::MouseButton button, Qt::MouseButtons buttons) {
+        QMouseEvent event(type, pos, grid->mapToGlobal(pos), button, buttons, Qt::NoModifier);
+        QCoreApplication::sendEvent(grid, &event);
+    };
+
+    grid->activateWindow();
     QCoreApplication::processEvents();
-    QTest::mouseMove(grid, to);
+
+    sendMouse(QEvent::MouseButtonPress, from, Qt::LeftButton, Qt::LeftButton);
+    sendMouse(QEvent::MouseMove, from + QPoint(30, 0), Qt::NoButton, Qt::LeftButton);
     QCoreApplication::processEvents();
-    QTest::mouseRelease(grid, Qt::LeftButton, Qt::NoModifier, to);
+    sendMouse(QEvent::MouseMove, to, Qt::NoButton, Qt::LeftButton);
+    QCoreApplication::processEvents();
+    sendMouse(QEvent::MouseButtonRelease, to, Qt::LeftButton, Qt::NoButton);
     QCoreApplication::processEvents();
 }
 
