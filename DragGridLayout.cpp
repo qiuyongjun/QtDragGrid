@@ -278,6 +278,13 @@ int DragGridLayout::indexOf(const QWidget *widget) const
     return -1;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+int DragGridLayout::indexOf(QWidget *widget) const
+{
+    return indexOf(static_cast<const QWidget *>(widget));
+}
+#endif
+
 QWidget *DragGridLayout::takeWidget(int index)
 {
     QLayoutItem *item = takeAt(index);
