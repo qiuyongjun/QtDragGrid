@@ -7,14 +7,17 @@
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-06-23
+## [0.2.0] - 2026-07-01
 
 ### Added
 
 - 新增键盘拖拽支持：`Space` 拾取、方向键移动、`Enter` 放下、`Escape` 取消。
 - 新增可选 `dragHandle()` / `setDragHandle()`，可限制仅通过手柄控件启动拖拽。
 - 新增自动滚动边距/速度、占位符透明度/脉冲时长配置。
+- 新增不完整行填满整行能力：`setFillIncompleteRowEnabled()`，旧的 `setCompactWhenSparseEnabled()` 作为兼容别名保留。
+- 演示程序新增列数、拖拽开关、不完整行填满、动画时长和清空卡片控制。
 - 新增基于 Qt Test 的 `DragGridLayout` 和 `DragGridWidget` 单元测试。
+- 更新项目预览图，展示最新拖拽和布局效果。
 
 ### Changed
 
@@ -22,6 +25,7 @@
 - `finishDrag()` 现在会将被拖拽控件平滑动画到最终单元格。
 - `autoScroll()` 不再标记为 `const`。
 - 将拖拽清理逻辑收敛到 `cleanupDragUi()`，避免 `finishDrag()` 与 `cancelDrag()` 重复实现。
+- CI 在 macOS 上改用 Qt 6.9.3，避开 Qt 6.8.0 与最新 macOS SDK 的 `AGL.framework` 链接问题。
 
 ### Fixed
 
@@ -31,6 +35,9 @@
 - 移除 `DragGridWidget.cpp` 中未使用的 `#include <QCursor>`。
 - 子控件发出 `LayoutRequest` 时，`DragGridLayout` 会使最小单元格尺寸缓存失效。
 - 几何动画完成后会从 `m_geometryAnimations` 移除，避免残留条目。
+- 修复不完整行填满时拖拽占位符和实际控件几何不一致导致的错位。
+- 修复原位置释放时复用拖拽镜像缩放几何导致的卡片重叠。
+- 修复非中心点按下拖拽时镜像锚点跳动的问题。
 
 ## [0.1.0] - 2026-06-22
 
