@@ -8,15 +8,15 @@
 #include <QSize>
 #include <QtGlobal>
 
-#include <QtDragGrid/QtDragGridGlobal.h>
+#include <YJDragGrid/YJDragGridGlobal.h>
 
 class QEvent;
 class QPropertyAnimation;
 class QWidget;
 
-namespace QtDragGrid {
+namespace YJDragGrid {
 
-class QTDRAGGRID_EXPORT DragGridLayout : public QLayout
+class YJDRAGGRID_EXPORT DragGridLayout : public QLayout
 {
     Q_DISABLE_COPY(DragGridLayout)
 
@@ -148,6 +148,6 @@ private:
     QHash<QWidget *, QPointer<QPropertyAnimation>> m_geometryAnimations;
 };
 
-} // namespace QtDragGrid
+} // namespace YJDragGrid
 
 #endif // DRAGGRIDLAYOUT_H

@@ -6,7 +6,7 @@
 #include <QSize>
 #include <QWidget>
 
-#include <QtDragGrid/QtDragGridGlobal.h>
+#include <YJDragGrid/YJDragGridGlobal.h>
 
 class QLabel;
 class QKeyEvent;
@@ -16,11 +16,11 @@ class QResizeEvent;
 class QScrollArea;
 class QTimer;
 
-namespace QtDragGrid {
+namespace YJDragGrid {
 
 class DragGridLayout;
 
-class QTDRAGGRID_EXPORT DragGridWidget : public QWidget
+class YJDRAGGRID_EXPORT DragGridWidget : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(int columnCount READ columnCount WRITE setColumnCount)
@@ -223,7 +223,7 @@ private:
     bool m_emptyStateVisible = true;
 };
 
-} // namespace QtDragGrid
+} // namespace YJDragGrid
 
 Q_DECLARE_METATYPE(QList<QWidget *>)
 

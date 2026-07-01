@@ -2,14 +2,14 @@
 #include "ui_MainWindow.h"
 
 #include "CardWidget.h"
-#include <QtDragGrid/DragGridWidget.h>
+#include <YJDragGrid/DragGridWidget.h>
 
 #include <QAbstractSpinBox>
 #include <QCheckBox>
 #include <QSlider>
 #include <QSpinBox>
 
-using QtDragGrid::DragGridWidget;
+using YJDragGrid::DragGridWidget;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

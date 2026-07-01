@@ -1,0 +1,14 @@
+#ifndef YJDRAGGRIDGLOBAL_H
+#define YJDRAGGRIDGLOBAL_H
+
+#include <QtGlobal>
+
+#if defined(YJDRAGGRID_STATIC)
+#  define YJDRAGGRID_EXPORT
+#elif defined(YJDRAGGRID_LIBRARY)
+#  define YJDRAGGRID_EXPORT Q_DECL_EXPORT
+#else
+#  define YJDRAGGRID_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // YJDRAGGRIDGLOBAL_H

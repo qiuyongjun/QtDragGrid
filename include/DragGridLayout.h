@@ -1,8 +1,8 @@
-#ifndef QTDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H
-#define QTDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H
+#ifndef YJDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H
+#define YJDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H
 
-#include <QtDragGrid/DragGridLayout.h>
+#include <YJDragGrid/DragGridLayout.h>
 
-using QtDragGrid::DragGridLayout;
+using YJDragGrid::DragGridLayout;
 
-#endif // QTDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H
+#endif // YJDRAGGRID_COMPAT_DRAGGRIDLAYOUT_H

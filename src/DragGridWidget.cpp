@@ -1,6 +1,6 @@
-#include <QtDragGrid/DragGridWidget.h>
+#include <YJDragGrid/DragGridWidget.h>
 
-#include <QtDragGrid/DragGridLayout.h>
+#include <YJDragGrid/DragGridLayout.h>
 
 #include <QGraphicsDropShadowEffect>
 #include <QGraphicsOpacityEffect>
@@ -16,7 +16,7 @@
 #include <QTimer>
 #include <QtGlobal>
 
-namespace QtDragGrid {
+namespace YJDragGrid {
 
 DragGridWidget::DragGridWidget(QScrollArea *scrollArea, QWidget *parent)
     : QWidget(parent)
@@ -929,4 +929,4 @@ void DragGridWidget::autoScroll()
     }
 }
 
-} // namespace QtDragGrid
+} // namespace YJDragGrid

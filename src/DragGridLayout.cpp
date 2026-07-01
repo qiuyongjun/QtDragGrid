@@ -1,4 +1,4 @@
-#include <QtDragGrid/DragGridLayout.h>
+#include <YJDragGrid/DragGridLayout.h>
 
 #include <QEvent>
 #include <QLayoutItem>
@@ -9,7 +9,7 @@
 #include <QWidgetItem>
 #include <QtGlobal>
 
-namespace QtDragGrid {
+namespace YJDragGrid {
 
 DragGridLayout::DragGridLayout(QWidget *parent)
     : QLayout(parent)
@@ -631,5 +631,5 @@ QRect DragGridLayout::placeholderRectAt(int placeholderIndex) const
     return cellRectForIndex(placeholderIndex, contentRect);
 }
 
-} // namespace QtDragGrid
+} // namespace YJDragGrid
 

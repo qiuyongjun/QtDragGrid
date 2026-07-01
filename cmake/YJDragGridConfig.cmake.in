@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Widgets)
+
+include("${CMAKE_CURRENT_LIST_DIR}/YJDragGridTargets.cmake")
+
+if(NOT TARGET DragGrid AND TARGET YJDragGrid::YJDragGrid)
+    add_library(DragGrid INTERFACE IMPORTED)
+    target_link_libraries(DragGrid INTERFACE YJDragGrid::YJDragGrid)
+endif()
+
+check_required_components(YJDragGrid)

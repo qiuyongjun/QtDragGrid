@@ -46,7 +46,7 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: "11.0"
         run: |
-          CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DQTDRAGGRID_BUILD_EXAMPLES=OFF -DQTDRAGGRID_BUILD_TESTS=ON"
+          CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DYJDRAGGRID_BUILD_EXAMPLES=OFF -DYJDRAGGRID_BUILD_TESTS=ON"
           if [ "${{ runner.os }}" = "macOS" ]; then
             CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0"
           fi
@@ -54,7 +54,7 @@ jobs:
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
-        run: cmake -S . -B build -DQTDRAGGRID_BUILD_EXAMPLES=OFF -DQTDRAGGRID_BUILD_TESTS=ON
+        run: cmake -S . -B build -DYJDRAGGRID_BUILD_EXAMPLES=OFF -DYJDRAGGRID_BUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config Release
@@ -86,7 +86,7 @@ jobs:
       - name: Package (Unix)
         if: runner.os != 'Windows'
         run: |
-          ASSET="QtDragGrid-${GITHUB_REF_NAME}-${{ runner.os }}-${{ matrix.qt-major }}.tar.gz"
+          ASSET="YJDragGrid-${GITHUB_REF_NAME}-${{ runner.os }}-${{ matrix.qt-major }}.tar.gz"
           tar czf "$ASSET" -C build/install .
           echo "ASSET_PATH=$ASSET" >> "$GITHUB_ENV"
 
@@ -94,7 +94,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $asset = "QtDragGrid-$env:GITHUB_REF_NAME-${{ runner.os }}-${{ matrix.qt-major }}.zip"
+          $asset = "YJDragGrid-$env:GITHUB_REF_NAME-${{ runner.os }}-${{ matrix.qt-major }}.zip"
           Compress-Archive -Path build/install/* -DestinationPath $asset
           "ASSET_PATH=$asset" | Out-File -FilePath $env:GITHUB_ENV -Append
 

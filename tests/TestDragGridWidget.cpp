@@ -8,9 +8,9 @@
 #include <QWidget>
 
 #include <DragGridWidget.h>
-#include <QtDragGrid/DragGridWidget.h>
+#include <YJDragGrid/DragGridWidget.h>
 
-using QtDragGrid::DragGridWidget;
+using YJDragGrid::DragGridWidget;
 
 class TestDragGridWidget : public QObject
 {

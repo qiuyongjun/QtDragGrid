@@ -1,6 +1,6 @@
-# QtDragGrid 贡献指南
+# YJDragGrid 贡献指南
 
-感谢你对 QtDragGrid 的关注。本文说明如何提交 Issue 和 Pull Request。
+感谢你对 YJDragGrid 的关注。本文说明如何提交 Issue 和 Pull Request。
 
 ## 提交 Issue
 

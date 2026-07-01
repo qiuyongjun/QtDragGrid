@@ -1,6 +1,6 @@
-# QtDragGrid API Contract
+# YJDragGrid API Contract
 
-This document describes the public behavior of `QtDragGrid::DragGridWidget`.
+This document describes the public behavior of `YJDragGrid::DragGridWidget`.
 
 ## Ownership
 
