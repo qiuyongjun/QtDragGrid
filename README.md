@@ -15,7 +15,7 @@ QtDragGrid provides a custom grid layout and a container widget that supports dr
 - Drag and drop to reorder cards inside a grid
 - Auto-scroll while dragging near viewport edges
 - Configurable column count and minimum cell size
-- Optional equal cell sizing and compact sparse layout
+- Optional equal cell sizing and incomplete-row filling
 - Pure Qt Widgets, no third-party dependencies
 - Compatible with Qt 5.15+ and Qt 6.x
 
@@ -76,7 +76,8 @@ grid->addWidget(new MyCardWidget());
 - `void setColumnCount(int count)` — Set the number of columns.
 - `void setMinimumCellSize(const QSize &size)` — Set the minimum cell size.
 - `void setEqualCellSizeEnabled(bool enable)` — Make all cells the same width.
-- `void setCompactWhenSparseEnabled(bool enable)` — Compact columns when there are few items.
+- `void setFillIncompleteRowEnabled(bool enable)` — Fill incomplete rows by spreading their remaining items across the row.
+- `void setCompactWhenSparseEnabled(bool enable)` — Compatibility alias for `setFillIncompleteRowEnabled`.
 - `void addWidget(QWidget *widget)` / `void insertWidget(int index, QWidget *widget)` — Add items.
 - `void removeWidget(QWidget *widget)` / `void deleteWidget(QWidget *widget)` / `QWidget *takeWidget(int index)` — Remove items.
 - `void clear()` — Remove and destroy all items.

@@ -105,9 +105,13 @@ public:
     void setEqualCellSizeEnabled(bool enable);
     // 返回是否启用统一单元格宽度。
     bool equalCellSizeEnabled() const;
-    // 设置项目较少时是否压缩列数。
+    // 设置不完整行是否按剩余项目数填满整行。
+    void setFillIncompleteRowEnabled(bool enable);
+    // 返回是否启用不完整行填满整行。
+    bool fillIncompleteRowEnabled() const;
+    // 设置不完整行是否填满整行，兼容旧接口。
     void setCompactWhenSparseEnabled(bool enable);
-    // 返回是否启用稀疏紧凑布局。
+    // 返回是否启用不完整行填满整行，兼容旧接口。
     bool compactWhenSparseEnabled() const;
 
     // 返回空状态提示文本。
@@ -170,6 +174,7 @@ private:
     QPoint m_pressPos;
     QPoint m_pressOffset;
     QPoint m_dragPointOffset;
+    QPoint m_dragGhostCursorOffset;
     QPoint m_lastMousePos;
     int m_keyboardDragStartIndex = -1;
 

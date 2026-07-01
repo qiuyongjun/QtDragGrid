@@ -14,6 +14,7 @@ class TestDragGridWidget : public QObject
 
 private slots:
     void dragEnabled_togglesState();
+    void fillIncompleteRowEnabled_roundTripAndCompat();
     void placeholderProperties_roundTrip();
     void dragHandle_canBeSet();
     void emptyText_defaultAndCustom();
@@ -24,6 +25,9 @@ private slots:
     void deleteWidget_duringDrag_removesDraggedWidget();
     void setDragEnabled_falseDuringDrag_cancelsDrag();
     void zeroAnimationDuration_reordersDirectly();
+    void mouseDrag_smallMoveKeepsGhostAnchored();
+    void mouseDrag_releaseAtOriginalIndexRestoresGeometry();
+    void mouseDrag_reordersWithStretchedLastRow();
 };
 
 namespace {
@@ -98,6 +102,22 @@ void TestDragGridWidget::dragEnabled_togglesState()
 
     grid.setDragEnabled(false);
     QVERIFY(!grid.dragEnabled());
+}
+
+void TestDragGridWidget::fillIncompleteRowEnabled_roundTripAndCompat()
+{
+    DragGridWidget grid;
+
+    QVERIFY(!grid.fillIncompleteRowEnabled());
+    QVERIFY(!grid.compactWhenSparseEnabled());
+
+    grid.setFillIncompleteRowEnabled(true);
+    QVERIFY(grid.fillIncompleteRowEnabled());
+    QVERIFY(grid.compactWhenSparseEnabled());
+
+    grid.setCompactWhenSparseEnabled(false);
+    QVERIFY(!grid.fillIncompleteRowEnabled());
+    QVERIFY(!grid.compactWhenSparseEnabled());
 }
 
 void TestDragGridWidget::placeholderProperties_roundTrip()
@@ -300,6 +320,112 @@ void TestDragGridWidget::zeroAnimationDuration_reordersDirectly()
                                                        QStringLiteral("first")}));
     QCOMPARE(first->geometry().top(), second->geometry().top());
     QVERIFY(first->geometry().left() > second->geometry().left());
+}
+
+void TestDragGridWidget::mouseDrag_smallMoveKeepsGhostAnchored()
+{
+    DragGridWidget grid;
+    auto *first = createItem(QStringLiteral("first"));
+    auto *second = createItem(QStringLiteral("second"));
+    auto *third = createItem(QStringLiteral("third"));
+    prepareGrid(&grid, first, second, third);
+    grid.setDragEnabled(true);
+
+    auto sendMouse = [&grid](QEvent::Type type, const QPoint &pos,
+                             Qt::MouseButton button, Qt::MouseButtons buttons) {
+        QMouseEvent event(type, pos, grid.mapToGlobal(pos), button, buttons, Qt::NoModifier);
+        QCoreApplication::sendEvent(&grid, &event);
+    };
+
+    const QPoint pressPos = second->geometry().topLeft() + QPoint(24, 24);
+    const QPoint movePos = pressPos + QPoint(-16, 0);
+    sendMouse(QEvent::MouseButtonPress, pressPos, Qt::LeftButton, Qt::LeftButton);
+    sendMouse(QEvent::MouseMove, movePos, Qt::NoButton, Qt::LeftButton);
+    QCoreApplication::processEvents();
+
+    auto *ghost = grid.findChild<QLabel *>(QStringLiteral("GridDragGhost"));
+    QVERIFY(ghost);
+
+    const QPoint centerOffset((ghost->width() - second->width()) / 2,
+                              (ghost->height() - second->height()) / 2);
+    QCOMPARE(ghost->pos(), movePos - QPoint(24, 24) - centerOffset);
+
+    QTest::keyClick(&grid, Qt::Key_Escape);
+    QCoreApplication::processEvents();
+}
+
+void TestDragGridWidget::mouseDrag_releaseAtOriginalIndexRestoresGeometry()
+{
+    DragGridWidget grid;
+    auto *first = createItem(QStringLiteral("first"));
+    auto *second = createItem(QStringLiteral("second"));
+    auto *third = createItem(QStringLiteral("third"));
+    prepareGrid(&grid, first, second, third);
+    grid.setAnimationDuration(200);
+    grid.setDragEnabled(true);
+
+    auto sendMouse = [&grid](QEvent::Type type, const QPoint &pos,
+                             Qt::MouseButton button, Qt::MouseButtons buttons) {
+        QMouseEvent event(type, pos, grid.mapToGlobal(pos), button, buttons, Qt::NoModifier);
+        QCoreApplication::sendEvent(&grid, &event);
+    };
+
+    const QRect originalGeometry = second->geometry();
+    const QPoint pressPos = second->geometry().topLeft() + QPoint(24, 24);
+    const QPoint releasePos = pressPos + QPoint(-16, 0);
+    sendMouse(QEvent::MouseButtonPress, pressPos, Qt::LeftButton, Qt::LeftButton);
+    sendMouse(QEvent::MouseMove, releasePos, Qt::NoButton, Qt::LeftButton);
+    QCoreApplication::processEvents();
+    sendMouse(QEvent::MouseButtonRelease, releasePos, Qt::LeftButton, Qt::NoButton);
+    QCoreApplication::processEvents();
+
+    QCOMPARE(objectNames(grid.widgets()), QStringList({QStringLiteral("first"),
+                                                       QStringLiteral("second"),
+                                                       QStringLiteral("third")}));
+    QCOMPARE(second->geometry(), originalGeometry);
+    QVERIFY(second->isVisible());
+    QVERIFY(!grid.findChild<QLabel *>(QStringLiteral("GridDragGhost")));
+}
+
+void TestDragGridWidget::mouseDrag_reordersWithStretchedLastRow()
+{
+    DragGridWidget grid;
+    grid.setColumnCount(4);
+    grid.setMinimumCellSize(QSize(100, 100));
+    grid.setAnimationDuration(0);
+    grid.setFillIncompleteRowEnabled(true);
+    grid.resize(400, 240);
+    grid.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&grid));
+
+    auto *first = createItem(QStringLiteral("first"));
+    auto *second = createItem(QStringLiteral("second"));
+    auto *third = createItem(QStringLiteral("third"));
+    auto *fourth = createItem(QStringLiteral("fourth"));
+    auto *fifth = createItem(QStringLiteral("fifth"));
+    auto *sixth = createItem(QStringLiteral("sixth"));
+    grid.addWidget(first);
+    grid.addWidget(second);
+    grid.addWidget(third);
+    grid.addWidget(fourth);
+    grid.addWidget(fifth);
+    grid.addWidget(sixth);
+    grid.layout()->activate();
+    QCoreApplication::processEvents();
+
+    grid.setDragEnabled(true);
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
+
+    dragFromTo(&grid, first->geometry().center(), sixth->geometry().center());
+
+    QCOMPARE(objectNames(grid.widgets()), QStringList({QStringLiteral("second"),
+                                                       QStringLiteral("third"),
+                                                       QStringLiteral("fourth"),
+                                                       QStringLiteral("fifth"),
+                                                       QStringLiteral("sixth"),
+                                                       QStringLiteral("first")}));
+    QCOMPARE(orderSpy.count(), 1);
+    QVERIFY(first->isVisible());
 }
 
 QTEST_MAIN(TestDragGridWidget)

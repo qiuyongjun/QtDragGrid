@@ -297,15 +297,25 @@ bool DragGridWidget::equalCellSizeEnabled() const
     return m_gridLayout->equalCellSizeEnabled();
 }
 
+void DragGridWidget::setFillIncompleteRowEnabled(bool enable)
+{
+    m_gridLayout->setFillIncompleteRowEnabled(enable);
+    updateGeometry();
+}
+
+bool DragGridWidget::fillIncompleteRowEnabled() const
+{
+    return m_gridLayout->fillIncompleteRowEnabled();
+}
+
 void DragGridWidget::setCompactWhenSparseEnabled(bool enable)
 {
-    m_gridLayout->setCompactWhenSparseEnabled(enable);
-    updateGeometry();
+    setFillIncompleteRowEnabled(enable);
 }
 
 bool DragGridWidget::compactWhenSparseEnabled() const
 {
-    return m_gridLayout->compactWhenSparseEnabled();
+    return fillIncompleteRowEnabled();
 }
 
 QString DragGridWidget::emptyText() const
@@ -517,6 +527,7 @@ void DragGridWidget::startDragOperation(QWidget *widget, const QPoint &offset, b
 
     m_draggedWidget = widget;
     m_dragPointOffset = offset;
+    m_dragGhostCursorOffset = QPoint();
 
     createDragGhost(widget);
     widget->hide();
@@ -633,6 +644,7 @@ void DragGridWidget::cleanupDragUi()
     m_pressWidget = nullptr;
     m_draggedWidget = nullptr;
     m_dragPointOffset = QPoint();
+    m_dragGhostCursorOffset = QPoint();
     m_keyboardDragStartIndex = -1;
 }
 
@@ -686,12 +698,24 @@ bool DragGridWidget::finishDrag()
     m_gridLayout->setIgnoredWidget(nullptr);
     m_gridLayout->setPlaceholderIndex(-1);
 
-    // 先计算目标位置，再清除幽灵，保证落位动画可以从幽灵当前位置平滑过渡。
     QRect targetRect;
     if (draggedWidget && finalPlaceholderIndex >= 0) {
         targetRect = m_gridLayout->placeholderRectAt(finalPlaceholderIndex);
     }
 
+    if (!hasOrderChanged) {
+        cleanupDragUi();
+        if (draggedWidget) {
+            if (targetRect.isValid()) {
+                draggedWidget->setGeometry(targetRect);
+            }
+            draggedWidget->show();
+            draggedWidget->setFocus();
+        }
+        return true;
+    }
+
+    // 顺序变化时才从幽灵位置做落位动画；原位释放不能复用 ghost 的缩放几何。
     QRect ghostRect;
     if (m_dragGhostWidget) {
         ghostRect = m_dragGhostWidget->geometry();
@@ -786,9 +810,11 @@ void DragGridWidget::createDragGhost(QWidget *source)
     shadowEffect->setOffset(4, 4);
     ghost->setGraphicsEffect(shadowEffect);
 
-    // 居中覆盖在原控件位置，避免初次跳动。
     const QPoint centerOffset((ghost->width() - source->width()) / 2,
                               (ghost->height() - source->height()) / 2);
+    m_dragGhostCursorOffset = m_dragPointOffset + centerOffset;
+
+    // 创建和移动使用同一个鼠标锚点，避免非中心按下时镜像突然偏移。
     ghost->move(source->pos() - centerOffset);
     ghost->raise();
     ghost->show();
@@ -802,9 +828,7 @@ void DragGridWidget::updateDragGhostPosition(const QPoint &cursorPos)
         return;
     }
 
-    const QPoint scaledOffset(qRound(m_dragPointOffset.x() * m_ghostScale),
-                              qRound(m_dragPointOffset.y() * m_ghostScale));
-    m_dragGhostWidget->move(cursorPos - scaledOffset);
+    m_dragGhostWidget->move(cursorPos - m_dragGhostCursorOffset);
 }
 
 void DragGridWidget::clearDragGhost()

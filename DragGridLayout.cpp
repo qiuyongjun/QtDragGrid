@@ -109,6 +109,8 @@ void DragGridLayout::setGeometry(const QRect &rect)
     const QRect contentRect = rect.adjusted(margins.left(), margins.top(), -margins.right(), -margins.bottom());
     const int columns = effectiveColumnCount();
     const QSize cellSize = effectiveCellSize(contentRect);
+    const bool reservePlaceholder = hasActivePlaceholder();
+    const int slotCount = visualItemCount();
     int visualIndex = 0;
 
     for (int index = 0; index < m_items.size(); ++index) {
@@ -122,16 +124,16 @@ void DragGridLayout::setGeometry(const QRect &rect)
             continue;
         }
 
-        // 拖拽中的控件由占位符接管视觉位置，其余控件顺延排布。
-        if (visualIndex == m_placeholderIndex) {
+        // 只有拖拽忽略项存在时才预留占位槽，避免结束拖拽后残留索引挤开布局。
+        if (reservePlaceholder && visualIndex == m_placeholderIndex) {
             ++visualIndex;
         }
 
-        QRect cell = cellRect(visualIndex, contentRect, columns, cellSize);
+        QRect cell = cellRect(visualIndex, contentRect, columns, cellSize, slotCount);
         ++visualIndex;
         QRect itemRect = cell;
         if (m_items[index].alignment) {
-            itemRect.setSize(expandedSizeForItem(m_items[index], cellSize));
+            itemRect.setSize(expandedSizeForItem(m_items[index], cell.size()));
             itemRect = QStyle::alignedRect(Qt::LeftToRight,
                                            m_items[index].alignment,
                                            itemRect.size(),
@@ -239,16 +241,26 @@ void DragGridLayout::setEqualCellSizeEnabled(bool enable)
 
 bool DragGridLayout::compactWhenSparseEnabled() const
 {
-    return m_compactWhenSparseEnabled;
+    return fillIncompleteRowEnabled();
 }
 
 void DragGridLayout::setCompactWhenSparseEnabled(bool enable)
 {
-    if (m_compactWhenSparseEnabled == enable) {
+    setFillIncompleteRowEnabled(enable);
+}
+
+bool DragGridLayout::fillIncompleteRowEnabled() const
+{
+    return m_fillIncompleteRowEnabled;
+}
+
+void DragGridLayout::setFillIncompleteRowEnabled(bool enable)
+{
+    if (m_fillIncompleteRowEnabled == enable) {
         return;
     }
 
-    m_compactWhenSparseEnabled = enable;
+    m_fillIncompleteRowEnabled = enable;
     invalidate();
 }
 
@@ -325,17 +337,13 @@ QRect DragGridLayout::cellRectForIndex(int index, const QRect &contentRect) cons
         return QRect();
     }
 
-    return cellRect(index, contentRect, columns, effectiveCellSize(contentRect));
+    return cellRect(index, contentRect, columns, effectiveCellSize(contentRect), visualItemCount());
 }
 
 int DragGridLayout::effectiveColumnCount() const
 {
     if (m_items.isEmpty()) {
         return 0;
-    }
-
-    if (m_compactWhenSparseEnabled) {
-        return qMax(1, qMin(m_columnCount, m_items.size()));
     }
 
     return qMax(1, m_columnCount);
@@ -439,6 +447,16 @@ int DragGridLayout::rowCount() const
     return (m_items.size() + columns - 1) / columns;
 }
 
+bool DragGridLayout::hasActivePlaceholder() const
+{
+    return m_ignoredWidget && m_placeholderIndex >= 0;
+}
+
+int DragGridLayout::visualItemCount() const
+{
+    return m_items.size();
+}
+
 QSize DragGridLayout::expandedSizeForItem(const Item &item, const QSize &cellSize) const
 {
     if (!item.layoutItem) {
@@ -455,18 +473,35 @@ int DragGridLayout::clampedInsertIndex(int index) const
     return qBound(0, index, m_items.size());
 }
 
-QRect DragGridLayout::cellRect(int index, const QRect &contentRect, int columns, const QSize &cellSize) const
+QRect DragGridLayout::cellRect(int index, const QRect &contentRect, int columns,
+                               const QSize &cellSize, int itemCount) const
 {
-    if (columns <= 0 || cellSize.isEmpty()) {
+    if (index < 0 || columns <= 0 || cellSize.isEmpty() || itemCount <= 0) {
         return QRect();
     }
 
-    const int col = index % columns;
-    const int row = index / columns;
+    const int safeIndex = qBound(0, index, itemCount - 1);
+    const int row = safeIndex / columns;
+    const int rowStart = row * columns;
+    const int itemsInRow = qMin(columns, itemCount - rowStart);
+    const int col = safeIndex - rowStart;
     const int layoutSpacing = qMax(0, spacing());
-    const int x = contentRect.x() + col * (cellSize.width() + layoutSpacing);
+    const bool fillRow = m_fillIncompleteRowEnabled && itemsInRow > 0 && itemsInRow < columns;
+
+    int x = contentRect.x() + col * (cellSize.width() + layoutSpacing);
+    int rowCellWidth = cellSize.width();
+    if (fillRow) {
+        const int availableWidth = qMax(0, contentRect.width()) - layoutSpacing * (itemsInRow - 1);
+        const int baseWidth = availableWidth / itemsInRow;
+        const int remainder = availableWidth % itemsInRow;
+        if (baseWidth >= cellSize.width()) {
+            rowCellWidth = baseWidth + (col < remainder ? 1 : 0);
+            x = contentRect.x() + col * (baseWidth + layoutSpacing) + qMin(col, remainder);
+        }
+    }
+
     const int y = contentRect.y() + row * (cellSize.height() + layoutSpacing);
-    return QRect(x, y, cellSize.width(), cellSize.height());
+    return QRect(x, y, rowCellWidth, cellSize.height());
 }
 
 void DragGridLayout::setWidgetGeometryAnimated(QWidget *widget, const QRect &target)
@@ -540,46 +575,50 @@ int DragGridLayout::targetIndexAt(const QPoint &pos) const
         return -1;
     }
 
-    return computeTargetIndex(pos - contentRect.topLeft(), columns,
-                              cellSize, spacing(), m_items.size());
-}
-
-int DragGridLayout::computeTargetIndex(const QPoint &localPos, int columns,
-                                       const QSize &cellSize, int layoutSpacing, int itemCount)
-{
-    Q_ASSERT(columns > 0);
-    Q_ASSERT(!cellSize.isEmpty());
-    Q_ASSERT(itemCount > 0);
-
-    const int safeSpacing = qMax(0, layoutSpacing);
-    const int stepWidth = qMax(1, cellSize.width() + safeSpacing);
-    const int stepHeight = qMax(1, cellSize.height() + safeSpacing);
-
-    // 左侧空白统一映射到首个位置，避免虚拟半区带来的不可预测行为。
-    if (localPos.x() < 0) {
+    const int itemCount = visualItemCount();
+    if (pos.y() < contentRect.top()) {
         return 0;
     }
 
-    const int row = qMax(0, localPos.y() / stepHeight);
-    const int col = localPos.x() / stepWidth;
+    const int layoutSpacing = qMax(0, spacing());
+    const int stepHeight = qMax(1, cellSize.height() + layoutSpacing);
+    const int rows = qMax(1, (itemCount + columns - 1) / columns);
+    const int row = qBound(0, (pos.y() - contentRect.top()) / stepHeight, rows - 1);
 
-    int rawIndex = row * columns + col;
+    return targetIndexInRow(pos, row, contentRect, columns, cellSize, itemCount);
+}
 
-    // 前后半区判断：多列时按水平方向，单列时按垂直方向。
-    if (columns > 1) {
-        const int xInCell = localPos.x() - col * stepWidth;
-        if (xInCell * 2 >= cellSize.width()) {
-            rawIndex += 1;
+int DragGridLayout::targetIndexInRow(const QPoint &pos, int row, const QRect &contentRect,
+                                     int columns, const QSize &cellSize, int itemCount) const
+{
+    const int rowStart = row * columns;
+    if (rowStart >= itemCount) {
+        return itemCount - 1;
+    }
+
+    const int rowEnd = qMin(itemCount - 1, rowStart + columns - 1);
+    for (int index = rowStart; index <= rowEnd; ++index) {
+        const QRect cell = cellRect(index, contentRect, columns, cellSize, itemCount);
+        if (!cell.isValid()) {
+            continue;
         }
-    } else {
-        const int yInCell = localPos.y() - row * stepHeight;
-        if (yInCell * 2 >= cellSize.height()) {
-            rawIndex += 1;
+
+        if (pos.x() < cell.left()) {
+            return index;
+        }
+        if (pos.x() <= cell.right()) {
+            if (columns == 1) {
+                return (pos.y() - cell.top()) * 2 >= cell.height()
+                        ? qMin(index + 1, itemCount - 1)
+                        : index;
+            }
+            return (pos.x() - cell.left()) * 2 >= cell.width()
+                    ? qMin(index + 1, itemCount - 1)
+                    : index;
         }
     }
 
-    // 占位槽数量与当前总项数相同（被忽略的项由占位符填补）。
-    return qBound(0, rawIndex, itemCount - 1);
+    return qMin(rowEnd + 1, itemCount - 1);
 }
 
 QRect DragGridLayout::placeholderRectAt(int placeholderIndex) const

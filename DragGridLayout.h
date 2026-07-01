@@ -52,9 +52,14 @@ public:
     // 设置是否按可用宽度扩展所有单元格。
     void setEqualCellSizeEnabled(bool enable);
 
-    // 返回是否在项目较少时压缩列数。
+    // 返回是否让不完整行按剩余项目数填满整行。
+    bool fillIncompleteRowEnabled() const;
+    // 设置不完整行是否填满整行。
+    void setFillIncompleteRowEnabled(bool enable);
+
+    // 返回是否启用不完整行填满整行，兼容旧接口。
     bool compactWhenSparseEnabled() const;
-    // 设置稀疏场景是否按项目数收缩列数。
+    // 设置不完整行是否填满整行，兼容旧接口。
     void setCompactWhenSparseEnabled(bool enable);
     // 返回当前实际用于布局的列数。
     int effectiveColumnCount() const;
@@ -108,13 +113,15 @@ private:
     QSize minimumCellSizeForItems() const;
     int minimumColumnCount() const;
     int rowCount() const;
+    bool hasActivePlaceholder() const;
+    int visualItemCount() const;
     QSize expandedSizeForItem(const Item &item, const QSize &cellSize) const;
     int clampedInsertIndex(int index) const;
 
-    QRect cellRect(int index, const QRect &contentRect, int columns, const QSize &cellSize) const;
-
-    static int computeTargetIndex(const QPoint &localPos, int columns,
-                                  const QSize &cellSize, int layoutSpacing, int itemCount);
+    QRect cellRect(int index, const QRect &contentRect, int columns,
+                   const QSize &cellSize, int itemCount) const;
+    int targetIndexInRow(const QPoint &pos, int row, const QRect &contentRect,
+                         int columns, const QSize &cellSize, int itemCount) const;
 
     void setWidgetGeometryAnimated(QWidget *widget, const QRect &target);
     void stopAnimationForWidget(QWidget *widget);
@@ -124,7 +131,7 @@ private:
     int m_columnCount = 4;
     QSize m_minimumCellSize = QSize(400, 300);
     bool m_equalCellSizeEnabled = true;
-    bool m_compactWhenSparseEnabled = false;
+    bool m_fillIncompleteRowEnabled = false;
     QWidget *m_ignoredWidget = nullptr;
     int m_placeholderIndex = -1;
     int m_animationDuration = 200;

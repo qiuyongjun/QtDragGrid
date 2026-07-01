@@ -14,12 +14,18 @@ private:
 private slots:
     void initTestCase();
 
-    void effectiveColumnCount_respectsCompactMode();
+    void fillIncompleteRowEnabled_roundTripAndCompat();
+    void fillIncompleteRowEnabled_stretchesSparseFirstRow();
+    void fillIncompleteRowEnabled_stretchesLastRow();
+    void fillIncompleteRowEnabled_keepsFullRowsUnchanged();
+    void targetIndexAt_usesStretchedLastRowGeometry();
     void moveItem_reordersWidgets();
     void moveItem_invalidFrom_returnsFalse();
     void targetIndexAt_mapsPositionsReasonably();
     void placeholderIndex_boundsAreRespected();
     void ignoredWidget_isSkippedInLayoutGeometry();
+    void placeholderIndex_withoutIgnoredWidgetDoesNotReserveSlot();
+    void placeholderRect_usesStretchedIncompleteRow();
 };
 
 void TestDragGridLayout::clearLayout(DragGridLayout *layout)
@@ -43,22 +49,124 @@ void TestDragGridLayout::initTestCase()
     // Qt Test 通过 QTEST_MAIN 已创建 QApplication，此处无需额外初始化。
 }
 
-void TestDragGridLayout::effectiveColumnCount_respectsCompactMode()
+namespace {
+
+QWidget *createLayoutItem()
+{
+    auto *widget = new QWidget;
+    widget->setMinimumSize(100, 100);
+    return widget;
+}
+
+void addItems(DragGridLayout *layout, int count)
+{
+    for (int index = 0; index < count; ++index) {
+        layout->addWidget(createLayoutItem());
+    }
+}
+
+} // namespace
+
+void TestDragGridLayout::fillIncompleteRowEnabled_roundTripAndCompat()
 {
     DragGridLayout layout;
-    layout.setColumnCount(4);
 
-    auto *w1 = new QWidget;
-    auto *w2 = new QWidget;
-    layout.addWidget(w1);
-    layout.addWidget(w2);
+    QVERIFY(!layout.fillIncompleteRowEnabled());
+    QVERIFY(!layout.compactWhenSparseEnabled());
 
-    QCOMPARE(layout.effectiveColumnCount(), 4); // 默认不紧凑
+    layout.setFillIncompleteRowEnabled(true);
+    QVERIFY(layout.fillIncompleteRowEnabled());
+    QVERIFY(layout.compactWhenSparseEnabled());
 
-    layout.setCompactWhenSparseEnabled(true);
-    QCOMPARE(layout.effectiveColumnCount(), 2); // 项目数少于列数时压缩
+    layout.setCompactWhenSparseEnabled(false);
+    QVERIFY(!layout.fillIncompleteRowEnabled());
+    QVERIFY(!layout.compactWhenSparseEnabled());
+}
 
-    clearLayout(&layout);
+void TestDragGridLayout::fillIncompleteRowEnabled_stretchesSparseFirstRow()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 100);
+
+    addItems(layout, 2);
+    layout->activate();
+
+    QCOMPARE(layout->itemAt(0)->widget()->geometry(), QRect(0, 0, 200, 100));
+    QCOMPARE(layout->itemAt(1)->widget()->geometry(), QRect(200, 0, 200, 100));
+
+    clearLayout(layout);
+}
+
+void TestDragGridLayout::fillIncompleteRowEnabled_stretchesLastRow()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 200);
+
+    addItems(layout, 6);
+    layout->activate();
+
+    QCOMPARE(layout->itemAt(4)->widget()->geometry(), QRect(0, 100, 200, 100));
+    QCOMPARE(layout->itemAt(5)->widget()->geometry(), QRect(200, 100, 200, 100));
+
+    clearLayout(layout);
+}
+
+void TestDragGridLayout::fillIncompleteRowEnabled_keepsFullRowsUnchanged()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 200);
+
+    addItems(layout, 8);
+    layout->activate();
+
+    QCOMPARE(layout->itemAt(4)->widget()->geometry(), QRect(0, 100, 100, 100));
+    QCOMPARE(layout->itemAt(7)->widget()->geometry(), QRect(300, 100, 100, 100));
+
+    clearLayout(layout);
+}
+
+void TestDragGridLayout::targetIndexAt_usesStretchedLastRowGeometry()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 200);
+
+    addItems(layout, 6);
+    layout->activate();
+
+    QCOMPARE(layout->targetIndexAt(QPoint(40, 150)), 4);
+    QCOMPARE(layout->targetIndexAt(QPoint(160, 150)), 5);
+    QCOMPARE(layout->targetIndexAt(QPoint(240, 150)), 5);
+    QCOMPARE(layout->targetIndexAt(QPoint(399, 150)), 5);
+
+    clearLayout(layout);
 }
 
 void TestDragGridLayout::moveItem_reordersWidgets()
@@ -180,6 +288,53 @@ void TestDragGridLayout::ignoredWidget_isSkippedInLayoutGeometry()
     QCOMPARE(w2->geometry().topLeft(), w1Pos);
 
     layout->setIgnoredWidget(nullptr);
+    clearLayout(layout);
+}
+
+void TestDragGridLayout::placeholderIndex_withoutIgnoredWidgetDoesNotReserveSlot()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 200);
+
+    addItems(layout, 6);
+    layout->setPlaceholderIndex(5);
+    layout->activate();
+
+    QCOMPARE(layout->itemAt(4)->widget()->geometry(), QRect(0, 100, 200, 100));
+    QCOMPARE(layout->itemAt(5)->widget()->geometry(), QRect(200, 100, 200, 100));
+
+    layout->setPlaceholderIndex(-1);
+    clearLayout(layout);
+}
+
+void TestDragGridLayout::placeholderRect_usesStretchedIncompleteRow()
+{
+    QWidget container;
+    auto *layout = new DragGridLayout(&container);
+    layout->setColumnCount(4);
+    layout->setMinimumCellSize(QSize(100, 100));
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setFillIncompleteRowEnabled(true);
+    container.setLayout(layout);
+    container.setGeometry(0, 0, 400, 200);
+
+    addItems(layout, 6);
+    layout->setIgnoredWidget(layout->itemAt(0)->widget());
+    layout->setPlaceholderIndex(4);
+    layout->activate();
+
+    QCOMPARE(layout->placeholderRectAt(4), QRect(0, 100, 200, 100));
+
+    layout->setIgnoredWidget(nullptr);
+    layout->setPlaceholderIndex(-1);
     clearLayout(layout);
 }
 

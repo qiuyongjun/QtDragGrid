@@ -13,6 +13,71 @@ QScrollArea > QWidget > QWidget {
     background-color: #f5f6fa;
 }
 
+/* 示例控制面板 */
+#demoControlPanel {
+    background-color: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 10px;
+}
+
+#demoControlPanel QLabel {
+    color: #3c4043;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QSpinBox {
+    min-width: 72px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #3c4043;
+    padding: 4px 8px;
+    selection-background-color: #4a90e2;
+}
+
+QSpinBox:focus {
+    border: 1px solid #4a90e2;
+}
+
+QCheckBox {
+    color: #3c4043;
+    font-size: 13px;
+    spacing: 6px;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #c9cdd4;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #4a90e2;
+    border: 1px solid #4a90e2;
+}
+
+QSlider::groove:horizontal {
+    height: 4px;
+    border-radius: 2px;
+    background-color: #d7dce2;
+}
+
+QSlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    border-radius: 7px;
+    background-color: #4a90e2;
+}
+
+QSlider::sub-page:horizontal {
+    border-radius: 2px;
+    background-color: #4a90e2;
+}
+
 /* 卡片基础样式 */
 CardWidget {
     background-color: #ffffff;
