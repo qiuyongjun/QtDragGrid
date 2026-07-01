@@ -151,7 +151,7 @@ signals:
     // 用户拖拽导致单个控件位置变化后发出。
     void itemMoved(int from, int to);
     // 用户拖拽改变顺序后发出当前完整顺序。
-    void orderChanged(const QList<QWidget *> &widgets);
+    void orderUpdated(const QList<QWidget *> &widgets);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

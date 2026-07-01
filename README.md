@@ -101,7 +101,7 @@ See [docs/api.md](docs/api.md) for the public behavior contract.
 - `int count() const` / `QList<QWidget *> widgets() const` — Query current items.
 - `void orderChanged()` — Signal emitted when the user reorders items by dragging.
 - `void itemMoved(int from, int to)` — Signal emitted with the moved item's original and final index.
-- `void orderChanged(const QList<QWidget *> &widgets)` — Signal emitted with the complete order after a user reorder.
+- `void orderUpdated(const QList<QWidget *> &widgets)` — Signal emitted with the complete order after a user reorder.
 - `int dragThreshold() / void setDragThreshold(int)` — Pixel distance before a press becomes a drag.
 - `qreal ghostScale() / void setGhostScale(qreal)` — Scale factor of the drag ghost (default 1.05).
 - `int animationDuration() / void setAnimationDuration(int)` — Layout transition duration in milliseconds (default 200).

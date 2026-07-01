@@ -15,8 +15,8 @@ This document describes the public behavior of `QtDragGrid::DragGridWidget`.
 - `widgets()` returns widgets in their current visual order.
 - User-driven reorder emits all reorder signals only when the final order changes.
 - `itemMoved(int from, int to)` reports the original index and final index of the moved widget.
-- `orderChanged(const QList<QWidget *> &widgets)` reports the complete order after the move.
-- `orderChanged()` is kept for source compatibility.
+- `orderUpdated(const QList<QWidget *> &widgets)` reports the complete order after the move.
+- `orderChanged()` is the source-compatible legacy notification signal.
 
 ## Dragging
 

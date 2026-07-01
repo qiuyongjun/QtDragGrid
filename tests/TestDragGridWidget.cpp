@@ -225,7 +225,7 @@ void TestDragGridWidget::mouseDrag_reordersWidgets()
     auto *third = createItem(QStringLiteral("third"));
     prepareGrid(&grid, first, second, third);
     grid.setDragEnabled(true);
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     dragFromTo(&grid, first->geometry().center(), third->geometry().center() + QPoint(60, 0));
 
@@ -246,7 +246,7 @@ void TestDragGridWidget::keyboardDrag_reordersWidgets()
     grid.activateWindow();
     first->setFocus();
     QCoreApplication::processEvents();
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::keyClick(&grid, Qt::Key_Space);
     QTest::keyClick(&grid, Qt::Key_Right);
@@ -273,8 +273,8 @@ void TestDragGridWidget::keyboardDrag_emitsDetailedSignals()
     QCoreApplication::processEvents();
 
     QSignalSpy movedSpy(&grid, &DragGridWidget::itemMoved);
-    QSignalSpy detailedOrderSpy(&grid, QOverload<const QList<QWidget *> &>::of(&DragGridWidget::orderChanged));
-    QSignalSpy legacyOrderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy detailedOrderSpy(&grid, &DragGridWidget::orderUpdated);
+    QSignalSpy legacyOrderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::keyClick(&grid, Qt::Key_Space);
     QTest::keyClick(&grid, Qt::Key_Right);
@@ -300,7 +300,7 @@ void TestDragGridWidget::escapeDuringDrag_restoresOriginalOrder()
     auto *third = createItem(QStringLiteral("third"));
     prepareGrid(&grid, first, second, third);
     grid.setDragEnabled(true);
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
     // 目标点需越过 cell 中心，避免 Qt 5.15.2 offscreen 取整导致占位符判断落在原 cell。
@@ -322,7 +322,7 @@ void TestDragGridWidget::deleteWidget_duringDrag_removesDraggedWidget()
     auto *second = createItem(QStringLiteral("second"));
     prepareGrid(&grid, first, second);
     grid.setDragEnabled(true);
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
     // 目标点需越过 cell 中心，避免 Qt 5.15.2 offscreen 取整导致占位符判断落在原 cell。
@@ -344,7 +344,7 @@ void TestDragGridWidget::setDragEnabled_falseDuringDrag_cancelsDrag()
     auto *third = createItem(QStringLiteral("third"));
     prepareGrid(&grid, first, second, third);
     grid.setDragEnabled(true);
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     QTest::mousePress(&grid, Qt::LeftButton, Qt::NoModifier, first->geometry().center());
     // 目标点需越过 cell 中心，避免 Qt 5.15.2 offscreen 取整导致占位符判断落在原 cell。
@@ -477,7 +477,7 @@ void TestDragGridWidget::mouseDrag_reordersWithStretchedLastRow()
     QCoreApplication::processEvents();
 
     grid.setDragEnabled(true);
-    QSignalSpy orderSpy(&grid, QOverload<>::of(&DragGridWidget::orderChanged));
+    QSignalSpy orderSpy(&grid, &DragGridWidget::orderChanged);
 
     dragFromTo(&grid, first->geometry().center(), sixth->geometry().center());
 

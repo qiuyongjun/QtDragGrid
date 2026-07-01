@@ -761,7 +761,7 @@ bool DragGridWidget::finishDrag()
 
     if (hasOrderChanged) {
         emit itemMoved(movedFrom, movedTo);
-        emit orderChanged(widgets());
+        emit orderUpdated(widgets());
         emit orderChanged();
     }
     return true;

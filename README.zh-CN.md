@@ -101,7 +101,7 @@ grid->addWidget(new MyCardWidget());
 - `int count() const` / `QList<QWidget *> widgets() const` — 查询当前子控件。
 - `void orderChanged()` — 用户通过拖拽改变顺序时发出的信号。
 - `void itemMoved(int from, int to)` — 用户拖拽改变顺序后发出移动前后的索引。
-- `void orderChanged(const QList<QWidget *> &widgets)` — 用户拖拽改变顺序后发出完整顺序。
+- `void orderUpdated(const QList<QWidget *> &widgets)` — 用户拖拽改变顺序后发出完整顺序。
 - `int dragThreshold() / void setDragThreshold(int)` — 触发拖拽的按压移动阈值（像素，默认 6）。
 - `qreal ghostScale() / void setGhostScale(qreal)` — 拖拽镜像缩放比例（默认 1.05）。
 - `int animationDuration() / void setAnimationDuration(int)` — 布局过渡动画时长，单位毫秒（默认 200）。

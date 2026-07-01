@@ -7,10 +7,12 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-01
+
 ### Added
 
 - `DragGridWidget` exposes main configuration options through `Q_PROPERTY`.
-- Added `itemMoved(int from, int to)` and `orderChanged(const QList<QWidget *> &widgets)` for easier order persistence.
+- Added `itemMoved(int from, int to)` and `orderUpdated(const QList<QWidget *> &widgets)` for easier order persistence.
 - Added public API contract and release checklist documentation.
 - CI now verifies install/export metadata with `cmake --install`.
 
